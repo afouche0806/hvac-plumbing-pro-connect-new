@@ -1,23 +1,35 @@
 import React from 'react';
 import { StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Linking } from 'react-native';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useCard } from '../../context/CardContext';
+import { ThemedView } from '@/components/themed-view';
+import { ThemedText } from '@/components/themed-text';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const { cardData, loading } = useCard();
+  const router = useRouter();
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (cardData) {
       const cardString = `
-        Name: ${cardData.name}
-        Title: ${cardData.title}
-        Company: ${cardData.company}
-        Phone: ${cardData.phone1}
-        Email: ${cardData.email1}
-        Website: ${cardData.website}
+Name: ${cardData.name}
+Title: ${cardData.title}
+Company: ${cardData.company}
+Phone: ${cardData.phone1}
+Email: ${cardData.email1}
+Website: ${cardData.website}
       `;
-      Alert.alert("Share Business Card", cardString); // Simple share for now
+
+      try {
+        const fileUri = FileSystem.cacheDirectory + 'business_card.txt';
+        await FileSystem.writeAsStringAsync(fileUri, cardString);
+        await Sharing.shareAsync(fileUri);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to share business card.');
+        console.error('Error sharing:', error);
+      }
     }
   };
 
@@ -57,6 +69,10 @@ export default function HomeScreen() {
 
       <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
         <ThemedText style={styles.shareButtonText}>Share Business Card</ThemedText>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.editButton} onPress={() => router.push('/editor')}>
+        <ThemedText style={styles.editButtonText}>Edit Business Card</ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );
@@ -101,6 +117,18 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   shareButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  editButton: {
+    backgroundColor: '#6c757d',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    marginTop: 10,
+  },
+  editButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
