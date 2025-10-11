@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Linking } from 'react-native';
+import { StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Linking, Image, View, ScrollView } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useCard } from '../../context/CardContext';
@@ -51,29 +52,47 @@ Website: ${cardData.website}
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.name}>{cardData.name}</ThemedText>
-      <ThemedText style={styles.title}>{cardData.title}</ThemedText>
-      <ThemedText style={styles.company}>{cardData.company}</ThemedText>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Image source={require('../../assets/images/LogoMakerCa-1759167128524.png')} style={styles.logo} />
+        <ThemedText style={styles.tagline}>HVAC - Plumbing and Electrical</ThemedText>
 
-      <ThemedView style={styles.infoSection}>
-        <TouchableOpacity onPress={() => Linking.openURL(`tel:${cardData.phone1}`)}>
-          <ThemedText style={styles.infoText}>Phone: {cardData.phone1}</ThemedText>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => Linking.openURL(`mailto:${cardData.email1}`)}>
-          <ThemedText style={styles.infoText}>Email: {cardData.email1}</ThemedText>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => Linking.openURL(cardData.website)}>
-          <ThemedText style={styles.infoText}>Website: {cardData.website}</ThemedText>
-        </TouchableOpacity>
-      </ThemedView>
+        <ThemedView style={styles.socialMediaContainer}>
+          {cardData.facebook && (
+            <TouchableOpacity onPress={() => Linking.openURL(cardData.facebook)}>
+              <FontAwesome name="facebook-square" size={30} color="#3b5998" style={styles.socialIcon} />
+            </TouchableOpacity>
+          )}
+          {cardData.instagram && (
+            <TouchableOpacity onPress={() => Linking.openURL(cardData.instagram)}>
+              <FontAwesome name="instagram" size={30} color="#E4405F" style={styles.socialIcon} />
+            </TouchableOpacity>
+          )}
+          {cardData.linkedin && (
+            <TouchableOpacity onPress={() => Linking.openURL(cardData.linkedin)}>
+              <FontAwesome name="linkedin-square" size={30} color="#0077B5" style={styles.socialIcon} />
+            </TouchableOpacity>
+          )}
+          {cardData.whatsapp && (
+            <TouchableOpacity onPress={() => Linking.openURL(cardData.whatsapp)}>
+              <FontAwesome name="whatsapp" size={30} color="#25D366" style={styles.socialIcon} />
+            </TouchableOpacity>
+          )}
+        </ThemedView>
 
-      <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-        <ThemedText style={styles.shareButtonText}>Share Business Card</ThemedText>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+          <ThemedText style={styles.shareButtonText}>Share Business Card</ThemedText>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.editButton} onPress={() => router.push('/editor')}>
-        <ThemedText style={styles.editButtonText}>Edit Business Card</ThemedText>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.qrCodeButton} onPress={() => router.push({ pathname: '/qr-code-modal', params: { cardData: JSON.stringify(cardData) } } as any)}>
+          <ThemedText style={styles.qrCodeButtonText}>Show QR Code</ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.editButton} onPress={() => router.push('/editor')}>
+          <ThemedText style={styles.editButtonText}>Edit Business Card</ThemedText>
+        </TouchableOpacity>
+
+
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -81,56 +100,59 @@ Website: ${cardData.website}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    paddingTop: 50,
+    paddingHorizontal: 20,
   },
-  name: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  title: {
-    fontSize: 22,
-    color: '#666',
-    marginTop: 4,
-  },
-  company: {
-    fontSize: 18,
-    fontStyle: 'italic',
+  logo: {
+    width: 100,
+    height: 80,
+    resizeMode: 'stretch',
     marginBottom: 20,
   },
-  infoSection: {
-    alignSelf: 'stretch',
-    marginVertical: 20,
+  tagline: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
-  infoText: {
-    fontSize: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  socialMediaContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  socialIcon: {
+    marginHorizontal: 10,
   },
   shareButton: {
     backgroundColor: '#007bff',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 25,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 10,
     marginTop: 30,
   },
   shareButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
-  },
-  editButton: {
-    backgroundColor: '#6c757d',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 25,
+  },  editButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 10,
     marginTop: 10,
   },
   editButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
+  },  qrCodeButton: {
+    backgroundColor: '#28a745', // Green color
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginTop: 10,
   },
-});
+  qrCodeButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },});

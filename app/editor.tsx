@@ -1,29 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet, ScrollView } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { useCard } from '../context/CardContext';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 
 export default function EditorScreen() {
-  const { cardData, updateCardData } = useCard();
+  const { cardData, updateCardData, contacts, addContact, updateContact } = useCard();
   const router = useRouter();
 
-  const [name, setName] = useState(cardData?.name || '');
-  const [title, setTitle] = useState(cardData?.title || '');
-  const [company, setCompany] = useState(cardData?.company || '');
-  const [phone1, setPhone1] = useState(cardData?.phone1 || '');
-  const [phone2, setPhone2] = useState(cardData?.phone2 || '');
-  const [email1, setEmail1] = useState(cardData?.email1 || '');
-  const [email2, setEmail2] = useState(cardData?.email2 || '');
-  const [website, setWebsite] = useState(cardData?.website || '');
-  const [facebook, setFacebook] = useState(cardData?.facebook || '');
-  const [instagram, setInstagram] = useState(cardData?.instagram || '');
-  const [linkedin, setLinkedin] = useState(cardData?.linkedin || '');
-  const [whatsapp, setWhatsapp] = useState(cardData?.whatsapp || '');
+  const { contactName } = useLocalSearchParams();
+  const isEditingContact = !!contactName;
+
+  const initialData = isEditingContact
+    ? contacts.find(c => c.name === contactName)
+    : cardData;
+
+  const [name, setName] = useState(initialData?.name || '');
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [company, setCompany] = useState(initialData?.company || '');
+  const [phone1, setPhone1] = useState(initialData?.phone1 || '');
+  const [phone2, setPhone2] = useState(initialData?.phone2 || '');
+  const [email1, setEmail1] = useState(initialData?.email1 || '');
+  const [email2, setEmail2] = useState(initialData?.email2 || '');
+  const [website, setWebsite] = useState(initialData?.website || '');
+  const [facebook, setFacebook] = useState(initialData?.facebook || '');
+  const [instagram, setInstagram] = useState(initialData?.instagram || '');
+  const [linkedin, setLinkedin] = useState(initialData?.linkedin || '');
+  const [whatsapp, setWhatsapp] = useState(initialData?.whatsapp || '');
 
   useEffect(() => {
-    if (cardData) {
+    if (isEditingContact && contactName) {
+      const contactToEdit = contacts.find(c => c.name === contactName);
+      if (contactToEdit) {
+        setName(contactToEdit.name);
+        setTitle(contactToEdit.title);
+        setCompany(contactToEdit.company);
+        setPhone1(contactToEdit.phone1);
+        setPhone2(contactToEdit.phone2);
+        setEmail1(contactToEdit.email1);
+        setEmail2(contactToEdit.email2);
+        setWebsite(contactToEdit.website);
+        setFacebook(contactToEdit.facebook);
+        setInstagram(contactToEdit.instagram);
+        setLinkedin(contactToEdit.linkedin);
+        setWhatsapp(contactToEdit.whatsapp);
+      }
+    } else if (!isEditingContact && cardData) {
       setName(cardData.name);
       setTitle(cardData.title);
       setCompany(cardData.company);
@@ -37,10 +60,10 @@ export default function EditorScreen() {
       setLinkedin(cardData.linkedin);
       setWhatsapp(cardData.whatsapp);
     }
-  }, [cardData]);
+  }, [cardData, contacts, contactName, isEditingContact]);
 
   const handleSave = async () => {
-    const updatedData = {
+    const dataToSave = {
       name,
       title,
       company,
@@ -54,14 +77,26 @@ export default function EditorScreen() {
       linkedin,
       whatsapp,
     };
-    await updateCardData(updatedData);
-    Alert.alert('Success', 'Business card updated!');
+
+    if (isEditingContact && contactName) {
+      await updateContact(contactName, dataToSave);
+      Alert.alert('Success', 'Contact updated!');
+    } else if (isEditingContact && !contactName) { // This case should ideally not happen if routed correctly
+      Alert.alert('Error', 'Cannot update contact without a name.');
+      return;
+    } else if (!isEditingContact && initialData?.name) { // Editing own card
+      await updateCardData(dataToSave);
+      Alert.alert('Success', 'Your business card updated!');
+    } else { // Adding new contact
+      await addContact(dataToSave);
+      Alert.alert('Success', 'New contact added!');
+    }
     router.back();
   };
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: 'Edit Business Card' }} />
+      <Stack.Screen options={{ title: isEditingContact ? 'Edit Contact' : 'Add Contact' }} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <ThemedText style={styles.label}>Name:</ThemedText>
         <TextInput style={styles.input} value={name} onChangeText={setName} />

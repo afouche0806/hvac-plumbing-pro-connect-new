@@ -15,6 +15,7 @@ interface CardData {
   instagram: string;
   linkedin: string;
   whatsapp: string;
+  theme?: 'light' | 'dark' | 'system';
 }
 
 // Define the context structure
@@ -22,6 +23,11 @@ interface CardContextType {
   cardData: CardData | null;
   loading: boolean;
   updateCardData: (newData: Partial<CardData>) => Promise<void>;
+  contacts: CardData[];
+  addContact: (newContact: CardData) => Promise<void>;
+  removeContact: (contactName: string) => Promise<void>;
+  updateContact: (contactName: string, updatedFields: Partial<CardData>) => Promise<void>;
+  updateTheme: (newTheme: 'light' | 'dark' | 'system') => Promise<void>;
 }
 
 // Create the context
@@ -41,25 +47,34 @@ const defaultData: CardData = {
   instagram: 'https://www.instagram.com/yourprofile',
   linkedin: 'https://www.linkedin.com/in/yourprofile',
   whatsapp: 'https://wa.me/27837986843',
+  theme: 'system',
 };
 
 const STORAGE_KEY = 'hvac_card_data';
+const CONTACTS_STORAGE_KEY = 'hvac_contacts_data';
 
 // Create the provider component
 export const CardProvider = ({ children }: { children: ReactNode }) => {
   const [cardData, setCardData] = useState<CardData | null>(null);
+  const [contacts, setContacts] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const storedData = await AsyncStorage.getItem(STORAGE_KEY);
+        const storedContacts = await AsyncStorage.getItem(CONTACTS_STORAGE_KEY);
+
         if (storedData) {
           setCardData(JSON.parse(storedData));
         } else {
           // If no data is stored, use the default data and save it
           setCardData(defaultData);
           await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+        }
+
+        if (storedContacts) {
+          setContacts(JSON.parse(storedContacts));
         }
       } catch (error) {
         console.error('Failed to load card data:', error);
@@ -80,8 +95,36 @@ export const CardProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const addContact = async (newContact: CardData) => {
+    const updatedContacts = [...contacts, newContact];
+    setContacts(updatedContacts);
+    await AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(updatedContacts));
+  };
+
+  const removeContact = async (contactName: string) => {
+    const updatedContacts = contacts.filter(contact => contact.name !== contactName);
+    setContacts(updatedContacts);
+    await AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(updatedContacts));
+  };
+
+  const updateContact = async (contactName: string, updatedFields: Partial<CardData>) => {
+    const updatedContacts = contacts.map(contact =>
+      contact.name === contactName ? { ...contact, ...updatedFields } : contact
+    );
+    setContacts(updatedContacts);
+    await AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(updatedContacts));
+  };
+
+  const updateTheme = async (newTheme: 'light' | 'dark' | 'system') => {
+    if (cardData) {
+      const updatedData = { ...cardData, theme: newTheme };
+      setCardData(updatedData);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+    }
+  };
+
   return (
-    <CardContext.Provider value={{ cardData, loading, updateCardData }}>
+    <CardContext.Provider value={{ cardData, loading, updateCardData, contacts, addContact, removeContact, updateContact, updateTheme }}>
       {children}
     </CardContext.Provider>
   );
