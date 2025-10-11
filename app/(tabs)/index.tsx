@@ -1,4 +1,5 @@
 import React from 'react';
+import { Picker } from '@react-native-picker/picker';
 import { StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Linking, Image, View, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
@@ -9,7 +10,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
-  const { cardData, loading } = useCard();
+  const { cardData, cards, currentCardIndex, loading, switchCard } = useCard();
   const router = useRouter();
 
   const handleShare = async () => {
@@ -55,6 +56,18 @@ Website: ${cardData.website}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image source={require('../../assets/images/LogoMakerCa-1759167128524.png')} style={styles.logo} />
         <ThemedText style={styles.tagline}>HVAC - Plumbing and Electrical</ThemedText>
+
+        {cards.length > 1 && (
+          <Picker
+            selectedValue={currentCardIndex.toString()}
+            style={styles.cardPicker}
+            onValueChange={(itemValue) => switchCard(parseInt(itemValue, 10))}
+          >
+            {cards.map((card, index) => (
+              <Picker.Item key={index} label={card.name} value={index.toString()} />
+            ))}
+          </Picker>
+        )}
 
         <ThemedView style={styles.socialMediaContainer}>
           {cardData.facebook && (
@@ -115,7 +128,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  socialMediaContainer: {
+  cardPicker: {
+    width: '80%',
+    height: 50,
+    marginBottom: 10,
+    color: '#fff', // Adjust based on theme
+    backgroundColor: '#333', // Adjust based on theme
+  },  cardPicker: {
+    width: '80%',
+    height: 50,
+    marginBottom: 10,
+    color: '#fff', // Adjust based on theme
+    backgroundColor: '#333', // Adjust based on theme
+  },  socialMediaContainer: {
     flexDirection: 'row',
     marginTop: 20,
     marginBottom: 20,
@@ -139,6 +164,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     marginTop: 10,
+    backgroundColor: 'red',
   },
   editButtonText: {
     color: '#fff',

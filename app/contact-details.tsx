@@ -94,6 +94,10 @@ export default function ContactDetailsScreen() {
           )}
         </ThemedView>
 
+        {contact.notes && (
+          <ThemedText style={styles.notesText}>Notes: {contact.notes}</ThemedText>
+        )}
+
         <TouchableOpacity style={styles.editButton} onPress={() => router.push({ pathname: '/editor', params: { contactName: contact.name } } as any)}>
           <ThemedText style={styles.editButtonText}>Edit Contact</ThemedText>
         </TouchableOpacity>
@@ -151,7 +155,13 @@ const styles = StyleSheet.create({
   socialIcon: {
     marginHorizontal: 10,
   },
-  editButton: {
+  notesText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    marginTop: 20,
+    paddingHorizontal: 20,
+    textAlign: 'center',
+  },  editButton: {
     backgroundColor: '#007bff',
     paddingVertical: 12,
     paddingHorizontal: 30,

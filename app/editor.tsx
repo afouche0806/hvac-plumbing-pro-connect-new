@@ -6,15 +6,19 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 
 export default function EditorScreen() {
-  const { cardData, updateCardData, contacts, addContact, updateContact } = useCard();
+  const { cardData, updateCardData, contacts, addContact, updateContact, cards, addCard, removeCard, switchCard } = useCard();
   const router = useRouter();
 
-  const { contactName } = useLocalSearchParams();
+  const { contactName, cardIndex } = useLocalSearchParams();
   const isEditingContact = !!contactName;
+  const isEditingUserCard = cardIndex !== undefined;
+  const parsedCardIndex = isEditingUserCard ? parseInt(cardIndex as string, 10) : -1;
 
   const initialData = isEditingContact
     ? contacts.find(c => c.name === contactName)
-    : cardData;
+    : isEditingUserCard
+      ? cards[parsedCardIndex]
+      : cardData; // Default to current user card if not editing contact or specific user card
 
   const [name, setName] = useState(initialData?.name || '');
   const [title, setTitle] = useState(initialData?.title || '');
@@ -28,8 +32,10 @@ export default function EditorScreen() {
   const [instagram, setInstagram] = useState(initialData?.instagram || '');
   const [linkedin, setLinkedin] = useState(initialData?.linkedin || '');
   const [whatsapp, setWhatsapp] = useState(initialData?.whatsapp || '');
+  const [notes, setNotes] = useState(initialData?.notes || '');
 
   useEffect(() => {
+    // Logic for editing a contact
     if (isEditingContact && contactName) {
       const contactToEdit = contacts.find(c => c.name === contactName);
       if (contactToEdit) {
@@ -45,8 +51,30 @@ export default function EditorScreen() {
         setInstagram(contactToEdit.instagram);
         setLinkedin(contactToEdit.linkedin);
         setWhatsapp(contactToEdit.whatsapp);
+        setNotes(contactToEdit.notes || '');
       }
-    } else if (!isEditingContact && cardData) {
+    }
+    // Logic for editing a specific user card
+    else if (isEditingUserCard && parsedCardIndex !== -1) {
+      const userCardToEdit = cards[parsedCardIndex];
+      if (userCardToEdit) {
+        setName(userCardToEdit.name);
+        setTitle(userCardToEdit.title);
+        setCompany(userCardToEdit.company);
+        setPhone1(userCardToEdit.phone1);
+        setPhone2(userCardToEdit.phone2);
+        setEmail1(userCardToEdit.email1);
+        setEmail2(userCardToEdit.email2);
+        setWebsite(userCardToEdit.website);
+        setFacebook(userCardToEdit.facebook);
+        setInstagram(userCardToEdit.instagram);
+        setLinkedin(userCardToEdit.linkedin);
+        setWhatsapp(userCardToEdit.whatsapp);
+        setNotes(userCardToEdit.notes || '');
+      }
+    }
+    // Logic for editing the currently active user card (if not editing a specific one or a contact)
+    else if (!isEditingContact && !isEditingUserCard && cardData) {
       setName(cardData.name);
       setTitle(cardData.title);
       setCompany(cardData.company);
@@ -59,8 +87,9 @@ export default function EditorScreen() {
       setInstagram(cardData.instagram);
       setLinkedin(cardData.linkedin);
       setWhatsapp(cardData.whatsapp);
+      setNotes(cardData.notes || '');
     }
-  }, [cardData, contacts, contactName, isEditingContact]);
+  }, [cardData, contacts, contactName, isEditingContact, isEditingUserCard, parsedCardIndex, cards]);
 
   const handleSave = async () => {
     const dataToSave = {
@@ -76,17 +105,18 @@ export default function EditorScreen() {
       instagram,
       linkedin,
       whatsapp,
+      notes,
     };
 
     if (isEditingContact && contactName) {
       await updateContact(contactName, dataToSave);
       Alert.alert('Success', 'Contact updated!');
-    } else if (isEditingContact && !contactName) { // This case should ideally not happen if routed correctly
-      Alert.alert('Error', 'Cannot update contact without a name.');
-      return;
-    } else if (!isEditingContact && initialData?.name) { // Editing own card
-      await updateCardData(dataToSave);
+    } else if (isEditingUserCard && parsedCardIndex !== -1) {
+      await updateCardData(dataToSave); // updateCardData now handles updating the specific card in the array
       Alert.alert('Success', 'Your business card updated!');
+    } else if (!isEditingContact && !isEditingUserCard) { // Adding a new user card
+      await addCard(dataToSave);
+      Alert.alert('Success', 'New business card added!');
     } else { // Adding new contact
       await addContact(dataToSave);
       Alert.alert('Success', 'New contact added!');
@@ -96,7 +126,7 @@ export default function EditorScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: isEditingContact ? 'Edit Contact' : 'Add Contact' }} />
+      <Stack.Screen options={{ title: isEditingContact ? 'Edit Contact' : (isEditingUserCard ? 'Edit Card' : 'Add Card') }} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <ThemedText style={styles.label}>Name:</ThemedText>
         <TextInput style={styles.input} value={name} onChangeText={setName} />
@@ -134,6 +164,15 @@ export default function EditorScreen() {
         <ThemedText style={styles.label}>WhatsApp:</ThemedText>
         <TextInput style={styles.input} value={whatsapp} onChangeText={setWhatsapp} />
 
+        <ThemedText style={styles.label}>Notes:</ThemedText>
+        <TextInput
+          style={[styles.input, styles.notesInput]}
+          value={notes}
+          onChangeText={setNotes}
+          multiline
+          numberOfLines={4}
+        />
+
         <View style={styles.buttonContainer}>
           <Button title="Save" onPress={handleSave} />
           <Button title="Cancel" onPress={() => router.back()} color="red" />
@@ -164,6 +203,10 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     backgroundColor: '#fff',
+  },
+  notesInput: {
+    height: 100,
+    textAlignVertical: 'top',
   },
   buttonContainer: {
     flexDirection: 'row',

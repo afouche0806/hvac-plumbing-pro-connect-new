@@ -16,13 +16,19 @@ interface CardData {
   linkedin: string;
   whatsapp: string;
   theme?: 'light' | 'dark' | 'system';
+  notes?: string;
 }
 
 // Define the context structure
 interface CardContextType {
-  cardData: CardData | null;
+  cardData: CardData; // Always a card selected
+  cards: CardData[]; // All user's cards
+  currentCardIndex: number; // Index of the currently active card
   loading: boolean;
   updateCardData: (newData: Partial<CardData>) => Promise<void>;
+  switchCard: (index: number) => Promise<void>;
+  addCard: (newCard: CardData) => Promise<void>;
+  removeCard: (index: number) => Promise<void>;
   contacts: CardData[];
   addContact: (newContact: CardData) => Promise<void>;
   removeContact: (contactName: string) => Promise<void>;
@@ -50,35 +56,47 @@ const defaultData: CardData = {
   theme: 'system',
 };
 
-const STORAGE_KEY = 'hvac_card_data';
+const CARDS_STORAGE_KEY = 'hvac_user_cards_data';
+const CURRENT_CARD_INDEX_STORAGE_KEY = 'hvac_current_card_index';
 const CONTACTS_STORAGE_KEY = 'hvac_contacts_data';
 
 // Create the provider component
 export const CardProvider = ({ children }: { children: ReactNode }) => {
-  const [cardData, setCardData] = useState<CardData | null>(null);
+  const [cards, setCards] = useState<CardData[]>([]);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const cardData = cards[currentCardIndex] || defaultData; // Expose current card
   const [contacts, setContacts] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const storedData = await AsyncStorage.getItem(STORAGE_KEY);
+        const storedCards = await AsyncStorage.getItem(CARDS_STORAGE_KEY);
+        const storedCurrentCardIndex = await AsyncStorage.getItem(CURRENT_CARD_INDEX_STORAGE_KEY);
         const storedContacts = await AsyncStorage.getItem(CONTACTS_STORAGE_KEY);
 
-        if (storedData) {
-          setCardData(JSON.parse(storedData));
+        if (storedCards) {
+          const parsedCards = JSON.parse(storedCards);
+          setCards(parsedCards);
+          if (storedCurrentCardIndex !== null) {
+            setCurrentCardIndex(parseInt(storedCurrentCardIndex, 10));
+          } else {
+            setCurrentCardIndex(0);
+          }
         } else {
-          // If no data is stored, use the default data and save it
-          setCardData(defaultData);
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+          // If no cards are stored, initialize with default data
+          setCards([defaultData]);
+          await AsyncStorage.setItem(CARDS_STORAGE_KEY, JSON.stringify([defaultData]));
+          await AsyncStorage.setItem(CURRENT_CARD_INDEX_STORAGE_KEY, '0');
         }
 
         if (storedContacts) {
           setContacts(JSON.parse(storedContacts));
         }
       } catch (error) {
-        console.error('Failed to load card data:', error);
-        setCardData(defaultData); // Fallback to default data on error
+        console.error('Failed to load data:', error);
+        setCards([defaultData]); // Fallback to default data on error
+        setCurrentCardIndex(0);
       } finally {
         setLoading(false);
       }
@@ -88,17 +106,46 @@ export const CardProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const updateCardData = async (newData: Partial<CardData>) => {
-    if (cardData) {
-      const updatedData = { ...cardData, ...newData };
-      setCardData(updatedData);
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
-    }
+    const updatedCards = cards.map((card, index) =>
+      index === currentCardIndex ? { ...card, ...newData } : card
+    );
+    setCards(updatedCards);
+    await AsyncStorage.setItem(CARDS_STORAGE_KEY, JSON.stringify(updatedCards));
   };
 
   const addContact = async (newContact: CardData) => {
     const updatedContacts = [...contacts, newContact];
     setContacts(updatedContacts);
     await AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(updatedContacts));
+  };
+
+  const switchCard = async (index: number) => {
+    if (index >= 0 && index < cards.length) {
+      setCurrentCardIndex(index);
+      await AsyncStorage.setItem(CURRENT_CARD_INDEX_STORAGE_KEY, index.toString());
+    }
+  };
+
+  const addCard = async (newCard: CardData) => {
+    const updatedCards = [...cards, newCard];
+    setCards(updatedCards);
+    await AsyncStorage.setItem(CARDS_STORAGE_KEY, JSON.stringify(updatedCards));
+  };
+
+  const removeCard = async (index: number) => {
+    if (cards.length > 1 && index >= 0 && index < cards.length) {
+      const updatedCards = cards.filter((_, i) => i !== index);
+      setCards(updatedCards);
+      if (currentCardIndex >= updatedCards.length) {
+        setCurrentCardIndex(updatedCards.length - 1);
+        await AsyncStorage.setItem(CURRENT_CARD_INDEX_STORAGE_KEY, (updatedCards.length - 1).toString());
+      } else {
+        await AsyncStorage.setItem(CURRENT_CARD_INDEX_STORAGE_KEY, currentCardIndex.toString());
+      }
+      await AsyncStorage.setItem(CARDS_STORAGE_KEY, JSON.stringify(updatedCards));
+    } else if (cards.length === 1) {
+      Alert.alert("Cannot delete last card", "You must have at least one business card.");
+    }
   };
 
   const removeContact = async (contactName: string) => {
@@ -124,7 +171,7 @@ export const CardProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CardContext.Provider value={{ cardData, loading, updateCardData, contacts, addContact, removeContact, updateContact, updateTheme }}>
+    <CardContext.Provider value={{ cardData, cards, currentCardIndex, loading, updateCardData, switchCard, addCard, removeCard, contacts, addContact, removeContact, updateContact, updateTheme }}>
       {children}
     </CardContext.Provider>
   );

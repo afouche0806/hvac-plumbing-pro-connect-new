@@ -8,8 +8,12 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCard } from '../../context/CardContext';
 
 export default function TabLayout() {
-  const { cardData } = useCard();
+  const { cardData, loading } = useCard();
   const colorScheme = cardData?.theme === 'system' ? useColorScheme() : cardData?.theme;
+
+  if (loading) {
+    return null; // Or a loading indicator
+  }
 
   return (
     <Tabs
