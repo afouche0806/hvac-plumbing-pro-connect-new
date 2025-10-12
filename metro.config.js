@@ -18,17 +18,4 @@ config.resolver.blockList = [
   /.*\/.gradle\/caches\/.*/,
 ];
 
-config.resolver.extraNodeModules = {
-  'three/examples/js/loaders/STLLoader': path.resolve(__dirname, 'node_modules/three/examples/jsm/loaders/STLLoader.js'),
-};
-
-// Custom resolver to handle the STLLoader issue
-const defaultResolveRequest = config.resolver.resolveRequest;
-config.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (moduleName === 'three/examples/js/loaders/STLLoader') {
-    return defaultResolveRequest(context, path.resolve(__dirname, 'node_modules/three/examples/jsm/loaders/STLLoader.js'), platform);
-  }
-  return defaultResolveRequest(context, moduleName, platform);
-};
-
 module.exports = config;
