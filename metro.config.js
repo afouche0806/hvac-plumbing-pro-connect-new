@@ -8,6 +8,7 @@ config.resolver.blockList = [
   /.*\/@firebase\/auth-compat\/node_modules\/@firebase\/auth\/dist\/cordova\/.*/,
   /.*\/react-native\/ReactCommon\/react\/renderer\/components\/scrollview\/platform\/android\/react\/renderer\/components\/.*/,
   /.*\/node_modules\/expo\/node_modules\/@expo\/cli\/build\/src\/start\/doctor\/apple\/.*/,
+  /.*\/node_modules\/firebase\/.*/,
 ];
 
 module.exports = config;
