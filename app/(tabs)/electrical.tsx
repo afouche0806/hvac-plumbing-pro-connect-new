@@ -107,17 +107,17 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   displayContainer: {
-    flex: 1,
+    flex: 0.8,
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
     padding: 15,
   },
   displayText: {
-    fontSize: 40,
+    fontSize: 36,
     color: '#fff',
   },
   buttonContainer: {
-    flex: 2,
+    flex: 2.2,
     margin: 5,
   },
   row: {
@@ -131,11 +131,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#333',
     margin: 3,
-    height: 60,
-    borderRadius: 30,
+    height: 50,
+    borderRadius: 25,
   },
   buttonText: {
-    fontSize: 24,
+    fontSize: 20,
     color: '#fff',
   },
   zeroButton: {
