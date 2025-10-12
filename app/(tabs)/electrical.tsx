@@ -1,44 +1,82 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert, Text, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function ElectricalScreen() {
-  const [current, setCurrent] = useState<string>('');
-  const [resistance, setResistance] = useState<string>('');
-  const [voltage, setVoltage] = useState<string>('');
+  const [displayValue, setDisplayValue] = useState('0');
+  const [operator, setOperator] = useState(null);
+  const [previousValue, setPreviousValue] = useState(null);
 
-  const calculateVoltage = () => {
-    const i = parseFloat(current);
-    const r = parseFloat(resistance);
+  const handleNumberInput = (num) => {
+    if (displayValue === '0') {
+      setDisplayValue(num.toString());
+    } else {
+      setDisplayValue(displayValue + num.toString());
+    }
+  };
 
-    if (isNaN(i) || isNaN(r)) {
-      Alert.alert('Invalid Input', 'Please enter valid numbers for current and resistance.');
-      return;
+  const handleOperatorInput = (op) => {
+    setOperator(op);
+    setPreviousValue(displayValue);
+    setDisplayValue('0');
+  };
+
+  const handleEqual = () => {
+    const current = parseFloat(displayValue);
+    const previous = parseFloat(previousValue);
+
+    if (operator === '+') {
+      setDisplayValue((previous + current).toString());
+    } else if (operator === '-') {
+      setDisplayValue((previous - current).toString());
+    } else if (operator === '*') {
+      setDisplayValue((previous * current).toString());
+    } else if (operator === '/') {
+      setDisplayValue((previous / current).toString());
     }
 
-    const v = i * r;
-    setVoltage(v.toFixed(2)); // Display voltage with 2 decimal places
+    setOperator(null);
+    setPreviousValue(null);
+  };
+
+  const handleClear = () => {
+    setDisplayValue('0');
+    setOperator(null);
+    setPreviousValue(null);
   };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Current (Amps)"
-        keyboardType="numeric"
-        value={current}
-        onChangeText={setCurrent}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Resistance (Ohms)"
-        keyboardType="numeric"
-        value={resistance}
-        onChangeText={setResistance}
-      />
-      <TouchableOpacity style={styles.button} onPress={calculateVoltage}>
-        <Text style={styles.buttonText}>Calculate Voltage</Text>
-      </TouchableOpacity>
-      {voltage ? <Text style={styles.resultText}>Voltage: {voltage} V</Text> : null}
+      <View style={styles.displayContainer}>
+        <Text style={styles.displayText}>{displayValue}</Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(7)}><Text style={styles.buttonText}>7</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(8)}><Text style={styles.buttonText}>8</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(9)}><Text style={styles.buttonText}>9</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('/')}><Text style={styles.buttonText}>/</Text></TouchableOpacity>
+        </View>
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(4)}><Text style={styles.buttonText}>4</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(5)}><Text style={styles.buttonText}>5</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(6)}><Text style={styles.buttonText}>6</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('*')}><Text style={styles.buttonText}>*</Text></TouchableOpacity>
+        </View>
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(1)}><Text style={styles.buttonText}>1</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(2)}><Text style={styles.buttonText}>2</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(3)}><Text style={styles.buttonText}>3</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('-')}><Text style={styles.buttonText}>-</Text></TouchableOpacity>
+        </View>
+        <View style={styles.row}>
+          <TouchableOpacity style={[styles.button, styles.zeroButton]} onPress={() => handleNumberInput(0)}><Text style={styles.buttonText}>0</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('+')}><Text style={styles.buttonText}>+</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.equalButton]} onPress={handleEqual}><Text style={styles.buttonText}>=</Text></TouchableOpacity>
+        </View>
+        <View style={styles.row}>
+          <TouchableOpacity style={[styles.button, styles.clearButton]} onPress={handleClear}><Text style={styles.buttonText}>C</Text></TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -46,36 +84,51 @@ export default function ElectricalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0', // Added a background color for visibility
+    backgroundColor: '#000',
+  },
+  displayContainer: {
+    flex: 2,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    padding: 20,
+  },
+  displayText: {
+    fontSize: 60,
+    color: '#fff',
+  },
+  buttonContainer: {
+    flex: 3,
+    margin: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   button: {
-    backgroundColor: '#007bff',
-    paddingVertical: 20,
-    paddingHorizontal: 40,
-    borderRadius: 8,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    margin: 5,
+    height: 80,
+    borderRadius: 40,
   },
   buttonText: {
+    fontSize: 30,
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
-  input: {
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    width: '80%',
-    fontSize: 16,
-    backgroundColor: '#fff',
+  zeroButton: {
+    flex: 2,
   },
-  resultText: {
-    marginTop: 20,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+  operatorButton: {
+    backgroundColor: '#f09a36',
+  },
+  equalButton: {
+    backgroundColor: '#f09a36',
+  },
+  clearButton: {
+    flex: 1,
+    backgroundColor: '#a5a5a5',
   },
 });
