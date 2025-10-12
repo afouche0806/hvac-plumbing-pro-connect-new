@@ -48,6 +48,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="calculator.fill" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="AR"
+        options={{
+          title: 'AR',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="camera.viewfinder" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
