@@ -44,6 +44,22 @@ export default function ElectricalScreen() {
     setPreviousValue(null);
   };
 
+  const handlePercent = () => {
+    const current = parseFloat(displayValue);
+    setDisplayValue((current / 100).toString());
+  };
+
+  const handleToggleSign = () => {
+    const current = parseFloat(displayValue);
+    setDisplayValue((-current).toString());
+  };
+
+  const handleDecimal = () => {
+    if (!displayValue.includes('.')) {
+      setDisplayValue(displayValue + '.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.displayContainer}>
@@ -51,30 +67,33 @@ export default function ElectricalScreen() {
       </View>
       <View style={styles.buttonContainer}>
         <View style={styles.row}>
+          <TouchableOpacity style={[styles.button, styles.specialButton]} onPress={handleClear}><Text style={styles.buttonText}>C</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.specialButton]} onPress={handleToggleSign}><Text style={styles.buttonText}>+/-</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.specialButton]} onPress={handlePercent}><Text style={styles.buttonText}>%</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('/')}><Text style={styles.buttonText}>/</Text></TouchableOpacity>
+        </View>
+        <View style={styles.row}>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(7)}><Text style={styles.buttonText}>7</Text></TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(8)}><Text style={styles.buttonText}>8</Text></TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(9)}><Text style={styles.buttonText}>9</Text></TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('/')}><Text style={styles.buttonText}>/</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('*')}><Text style={styles.buttonText}>*</Text></TouchableOpacity>
         </View>
         <View style={styles.row}>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(4)}><Text style={styles.buttonText}>4</Text></TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(5)}><Text style={styles.buttonText}>5</Text></TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(6)}><Text style={styles.buttonText}>6</Text></TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('*')}><Text style={styles.buttonText}>*</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('-')}><Text style={styles.buttonText}>-</Text></TouchableOpacity>
         </View>
         <View style={styles.row}>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(1)}><Text style={styles.buttonText}>1</Text></TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(2)}><Text style={styles.buttonText}>2</Text></TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => handleNumberInput(3)}><Text style={styles.buttonText}>3</Text></TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('-')}><Text style={styles.buttonText}>-</Text></TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('+')}><Text style={styles.buttonText}>+</Text></TouchableOpacity>
         </View>
         <View style={styles.row}>
           <TouchableOpacity style={[styles.button, styles.zeroButton]} onPress={() => handleNumberInput(0)}><Text style={styles.buttonText}>0</Text></TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.operatorButton]} onPress={() => handleOperatorInput('+')}><Text style={styles.buttonText}>+</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleDecimal}><Text style={styles.buttonText}>.</Text></TouchableOpacity>
           <TouchableOpacity style={[styles.button, styles.equalButton]} onPress={handleEqual}><Text style={styles.buttonText}>=</Text></TouchableOpacity>
-        </View>
-        <View style={styles.row}>
-          <TouchableOpacity style={[styles.button, styles.clearButton]} onPress={handleClear}><Text style={styles.buttonText}>C</Text></TouchableOpacity>
         </View>
       </View>
     </View>
@@ -85,37 +104,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+    paddingBottom: 20,
   },
   displayContainer: {
-    flex: 2,
+    flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
-    padding: 20,
+    padding: 15,
   },
   displayText: {
-    fontSize: 60,
+    fontSize: 40,
     color: '#fff',
   },
   buttonContainer: {
-    flex: 3,
-    margin: 10,
+    flex: 2,
+    margin: 5,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   button: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#333',
-    margin: 5,
-    height: 80,
-    borderRadius: 40,
+    margin: 3,
+    height: 60,
+    borderRadius: 30,
   },
   buttonText: {
-    fontSize: 30,
+    fontSize: 24,
     color: '#fff',
   },
   zeroButton: {
@@ -127,8 +147,7 @@ const styles = StyleSheet.create({
   equalButton: {
     backgroundColor: '#f09a36',
   },
-  clearButton: {
-    flex: 1,
+  specialButton: {
     backgroundColor: '#a5a5a5',
   },
 });

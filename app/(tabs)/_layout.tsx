@@ -41,6 +41,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.crop.circle.fill" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="electrical"
+        options={{
+          title: 'Calculator',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calculator.fill" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
