@@ -6,6 +6,7 @@ const config = getDefaultConfig(__dirname);
 config.resolver.blockList = [
   /.*\/react-native\/ReactAndroid\/.*/,
   /.*\/@firebase\/.*/,
+  /.*\/react-native\/ReactCommon\/.*/,
 ];
 
 module.exports = config;
