@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Camera } from 'expo-camera';
 import { GLView } from 'expo-gl';
-import { Renderer, TextureLoader } from 'expo-three';
+import { Renderer, TextureLoader, THREE } from 'expo-three';
 import {
   Scene,
   PerspectiveCamera,
@@ -12,6 +12,9 @@ import {
   MeshBasicMaterial,
   Mesh,
 } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
+global.THREE = global.THREE || THREE;
 
 export default function ARScreen() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -19,7 +22,7 @@ export default function ARScreen() {
   const [camera, setCamera] = useState(null);
   const [scene, setScene] = useState(null);
   const [renderer, setRenderer] = useState(null);
-  const [cube, setCube] = useState(null);
+  const [model, setModel] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -33,7 +36,6 @@ export default function ARScreen() {
 
     const { drawingBufferWidth: width, drawingBufferHeight: height } = gl;
 
-    // Create a WebGLRenderer without a DOM element
     const renderer = new Renderer({ gl });
     renderer.setSize(width, height);
     setRenderer(renderer);
@@ -42,22 +44,27 @@ export default function ARScreen() {
     setScene(scene);
 
     const camera = new PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.z = 2;
+    camera.position.z = 5;
     setCamera(camera);
 
-    scene.add(new AmbientLight(0xffffff, 0.5));
-    scene.add(new PointLight(0xffffff, 0.5));
+    scene.add(new AmbientLight(0xffffff, 0.7));
+    scene.add(new PointLight(0xffffff, 0.8));
 
-    const geometry = new BoxGeometry(1, 1, 1);
-    const material = new MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new Mesh(geometry, material);
-    scene.add(cube);
-    setCube(cube);
+    const loader = new GLTFLoader();
+    try {
+      const gltf = await loader.loadAsync('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb');
+      gltf.scene.scale.set(1, 1, 1); // Adjust scale as needed
+      gltf.scene.position.set(0, 0, 0); // Adjust position as needed
+      scene.add(gltf.scene);
+      setModel(gltf.scene);
+      console.log('GLTF model loaded successfully!');
+    } catch (error) {
+      console.error('Error loading GLTF model:', error);
+    }
 
     gl.createRenderLoop(() => {
-      if (cube) {
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
+      if (model) {
+        model.rotation.y += 0.01;
       }
       renderer.render(scene, camera);
       gl.endFrame();
