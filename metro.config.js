@@ -1,4 +1,5 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path'); // Import path module
 
 const config = getDefaultConfig(__dirname);
 
@@ -10,5 +11,9 @@ config.resolver.blockList = [
   /.*\/node_modules\/expo\/node_modules\/@expo\/cli\/build\/src\/start\/doctor\/apple\/.*/,
   /.*\/node_modules\/firebase\/.*/,
 ];
+
+config.resolver.extraNodeModules = {
+  'three/examples/js/loaders/STLLoader': path.resolve(__dirname, 'node_modules/three/examples/jsm/loaders/STLLoader.js'),
+};
 
 module.exports = config;
