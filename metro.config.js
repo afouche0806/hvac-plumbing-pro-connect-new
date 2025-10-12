@@ -1,13 +1,15 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path'); // Import path module
 
 const config = getDefaultConfig(__dirname);
 
 // This is a workaround for the ENOSPC error on Termux
-config.resolver.blockList = [
-  /.*\/react-native\/ReactAndroid\/src\/main\/res\/.*/,
-  /.*\/@firebase\/.*/,
-  /.*\/react-native\/ReactCommon\/react\/renderer\/components\/scrollview\/platform\/android\/react\/renderer\/components\/.*/,
-  /.*\/node_modules\/expo\/node_modules\/@expo\/cli\/build\/src\/start\/server\/metro\/debugging\/.*/,
+config.resolver.blockList = []; // Clear blockList
+
+// Explicitly define watchFolders to reduce the number of watched files
+config.watchFolders = [
+  __dirname,
+  path.resolve(__dirname, 'node_modules'), // Watch node_modules
 ];
 
 module.exports = config;
