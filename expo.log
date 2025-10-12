@@ -1,5 +1,28 @@
 Starting project at /data/data/com.termux/files/home/hvac-plumbing-pro-connect-new
+Project root (__dirname): /data/data/com.termux/files/home/hvac-plumbing-pro-connect-new
 React Compiler enabled
 Starting Metro Bundler
+warning: Bundler cache is empty, rebuilding (this may take a minute)
 Waiting on http://localhost:8081
 Logs for your project will appear below.
+/data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/expo/node_modules/@expo/cli/build/src/utils/errors.js:130
+    throw error;
+    ^
+
+Error: ENOSPC: System limit for number of file watchers reached, watch '/data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/react-native/ReactAndroid/src/main/res/devsupport/values-ta'
+    at FSWatcher.<computed> (node:internal/fs/watchers:254:19)
+    at Object.watch (node:fs:2549:36)
+    at FallbackWatcher._watchdir (/data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/metro-file-map/src/watchers/FallbackWatcher.js:88:24)
+    at /data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/metro-file-map/src/watchers/FallbackWatcher.js:23:16
+    at Walker.<anonymous> (/data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/metro-file-map/src/watchers/FallbackWatcher.js:322:31)
+    at Walker.emit (node:events:519:28)
+    at /data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/walker/lib/walker.js:69:16
+    at FSReqCallback.oncomplete (node:fs:187:23) {
+  errno: -28,
+  syscall: 'watch',
+  code: 'ENOSPC',
+  path: '/data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/react-native/ReactAndroid/src/main/res/devsupport/values-ta',
+  filename: '/data/data/com.termux/files/home/hvac-plumbing-pro-connect-new/node_modules/react-native/ReactAndroid/src/main/res/devsupport/values-ta'
+}
+
+Node.js v22.20.0
