@@ -7,6 +7,7 @@ config.resolver.blockList = [
   /.*\/react-native\/ReactAndroid\/.*/,
   /.*\/@firebase\/.*/,
   /.*\/react-native\/ReactCommon\/.*/,
+  /.*\/node_modules\/expo\/node_modules\/@expo\/cli\/.*/,
 ];
 
 module.exports = config;
