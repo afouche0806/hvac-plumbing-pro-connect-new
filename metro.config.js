@@ -18,6 +18,7 @@ config.resolver.blockList = [
   /.*\/.gradle\/caches\/.*/,
 ];
 
+
 config.resolver.extraNodeModules = {
   'expo-router/entry': path.resolve(__dirname, 'node_modules/expo-router/entry.js'),
 };

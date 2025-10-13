@@ -15,7 +15,8 @@
         "NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save photos",
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to use your camera",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to use your microphone"
-      }
+      },
+      "bundleIdentifier": "com.afouche69.hvacplumbingproconnect"
     },
     "android": {
       "adaptiveIcon": {
@@ -51,6 +52,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7ee9a041-6511-4aa0-b6d2-5cec848f0894"
+      }
+    },
+    "owner": "afouche69"
   }
 }
