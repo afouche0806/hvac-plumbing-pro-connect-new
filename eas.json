@@ -5,13 +5,17 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "pnpmVersion": "8"
     },
     "preview": {
       "distribution": "internal",
-      "credentialsSource": "local"
+      "credentialsSource": "local",
+      "pnpmVersion": "8"
     },
-    "production": {}
+    "production": {
+      "pnpmVersion": "8"
+    }
   },
   "submit": {
     "production": {}
