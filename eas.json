@@ -6,15 +6,15 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "pnpm": "8.6.12"
+      "pnpm": "10.18.1"
     },
     "preview": {
       "distribution": "internal",
       "credentialsSource": "local",
-      "pnpm": "8.6.12"
+      "pnpm": "10.18.1"
     },
     "production": {
-      "pnpm": "8.6.12"
+      "pnpm": "10.18.1"
     }
   },
   "submit": {
