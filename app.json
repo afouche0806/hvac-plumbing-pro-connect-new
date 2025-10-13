@@ -4,7 +4,7 @@
     "slug": "hvac-plumbing-pro-connect",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/hvac-logo.jpg",
+    "icon": "./assets/images/icon.png",
     "scheme": "hvacplumbingproconnectnew",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -21,7 +21,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/hvac-logo.jpg",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
