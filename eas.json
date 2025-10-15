@@ -6,7 +6,8 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "pnpm": "10.18.1"
+      "pnpm": "10.18.1",
+      "android": {}
     },
     "preview": {
       "distribution": "internal",
