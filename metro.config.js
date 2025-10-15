@@ -2,10 +2,27 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// Add a blockList to prevent Metro from watching specific problematic directories
-// within node_modules that cause ENOSPC errors due to excessive file watches.
+// This blockList is a targeted approach to prevent the ENOSPC error
+// by ignoring files and directories that are not needed for bundling.
 config.resolver.blockList = [
-  /node_modules\//, // Ignore all node_modules
+  // Ignore Git directories
+  /\.git\//,
+  // Ignore test files and directories
+  /.*\/__tests__\//,
+  /.*\/__mocks__\//,
+  /.*\.test\.js/,
+  // Ignore documentation files
+  /.*\/docs\//,
+  /.*\.md$/,
+  // Ignore build artifacts and caches
+  /.*\/android\/build\//,
+  /.*\/ios\/build\//,
+  /\.idea\//,
+  /\.vscode\//,
+  // Add more file types and directories to ignore
+  /.*\.podspec$/,
+  /.*\.flow$/,
+  /.*\.DS_Store$/,
 ];
 
 module.exports = config;
