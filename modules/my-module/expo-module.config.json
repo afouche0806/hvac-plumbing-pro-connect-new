@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["MyModule"]
+  },
+  "android": {
+    "modules": ["hvac pro connect.MyModule"]
+  }
+}
