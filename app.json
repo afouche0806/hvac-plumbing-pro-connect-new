@@ -36,6 +36,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-modules-autolinking",
       "@reactvision/react-viro/app.plugin.js",
       [
         "expo-splash-screen",
