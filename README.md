@@ -1,50 +1,38 @@
-# Welcome to your Expo app 👋
+# HVAC Plumbing Pro Connect Project - Development Log
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Last Session Summary (October 15, 2025)**
 
-## Get started
+This log summarizes the development progress and current state of the `hvac-plumbing-pro-connect-new` project.
 
-1. Install dependencies
+## Current Status:
 
-   ```bash
-   npm install
-   ```
+1.  **Local Development Environment (Termux):**
+    *   Encountered persistent `ENOSPC` (System limit for number of file watchers reached) errors.
+    *   Encountered `node-gyp` compilation failures during `eas-cli` installation, specifically related to `dtrace-provider` and Android NDK paths.
+    *   **Conclusion:** The Termux environment on the Android device has fundamental limitations (file watcher limits, `node-gyp` compatibility) that make it unsuitable for local development and building of this project.
 
-2. Start the app
+2.  **EAS Build Attempts (Cloud):**
+    *   Initial `eas build` failed due to `npm ci` reporting `package.json` and `package-lock.json` out of sync. This was resolved by running `npm install` locally, committing `package-lock.json`, and pushing to Git.
+    *   Encountered `ViroReact requires New Architecture to be enabled` error. `newArchEnabled=true` was already present in `gradle.properties` and `app.json`. An explicit append to `gradle.properties` was made.
+    *   Encountered persistent iOS-related prompts (encryption, Apple ID login) during Android-only `eas build --platform android`. This was due to the presence of the `ios` folder and implicit configuration. `eas.json` was modified to explicitly define the `development` profile for Android only.
+    *   **Current EAS Build Error:** `Namespace 'hvac pro connect' is not a valid Java package name`. This was fixed by changing `namespace "hvac pro connect"` to `namespace "hvacproconnect"` in `modules/my-module/android/build.gradle`.
 
-   ```bash
-   npx expo start
-   ```
+## Next Steps:
 
-In the output, you'll find options to open the app in a
+1.  **Development Environment Shift:** We are moving development to a more stable Linux environment.
+2.  **Debian Environment:** The user has a Debian (trixie) environment set up via `proot-distro` in Termux, with Node.js (v24.9.0) and npm (v11.6.0) already installed.
+3.  **Action Required:**
+    *   Log into the Debian environment: `proot-distro login debian`
+    *   Inside Debian, install `eas-cli`: `npm install -g eas-cli`
+    *   Navigate to the project directory (which will need to be cloned or copied into the Debian environment).
+    *   Run `eas login`.
+    *   Trigger the EAS build: `EAS_SKIP_AUTO_FINGERPRINT=1 eas build --profile development --platform android --clear-cache`
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Pending Local Changes:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+*   The `ios` folder is still present. It was decided to remove it, but this action was not yet performed.
+*   The `android/gradle.properties` file was modified to append `newArchEnabled=true`.
+*   The `eas.json` file was modified to explicitly define the `development` profile for Android.
+*   The `modules/my-module/android/build.gradle` file was modified to fix the invalid Java package name.
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Note:** Ensure all local changes are committed and pushed to Git before attempting EAS builds from the Debian environment.
